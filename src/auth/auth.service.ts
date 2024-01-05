@@ -1,12 +1,18 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as argon from 'argon2'
+import * as argon from 'argon2';
 import { AuthDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {}
   async signup(dto: AuthDto) {
     // generate the hash of the password
     const hash = await argon.hash(dto.password);
@@ -18,7 +24,7 @@ export class AuthService {
           hash,
         },
       });
-      return user;
+      return this.signToken(user.id, user.email);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -30,7 +36,38 @@ export class AuthService {
   }
 
   async signin(dto: AuthDto) {
-    const hash = await argon.hash(dto.password);
-    return { message: 'signin' };
+    // find the user by email
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    // if user does not exist throw exception
+    if (!user) {
+      throw new ForbiddenException('Credentials incorrect');
+    }
+
+    // compare the password
+    const pwMatches = await argon.verify(user.hash, dto.password);
+    // if password incorrect throw exception
+    if (!pwMatches) {
+      throw new ForbiddenException('Credentials incorrect');
+    }
+    return this.signToken(user.id, user.email);
+  }
+
+  async signToken(userId: number, email: string) {
+    const secret = this.config.get('JWT_SECRET');
+    const payload = {
+      sub: userId,
+      email,
+    };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+      secret: secret,
+    });
+    return {
+      access_token: accessToken,
+    };
   }
 }
