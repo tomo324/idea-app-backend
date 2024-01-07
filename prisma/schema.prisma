@@ -13,19 +13,34 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
+  name      String
   hash      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]
+
+  @@map("users")
 }
 
 model Post {
   id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
+  title     String?  @db.VarChar(80)
+  content   String   @db.VarChar(250)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+
+  @@map("posts")
+}
+
+model PostAi {
+  id        Int      @id @default(autoincrement())
+  title     String?  @db.VarChar(80)
+  content   String   @db.VarChar(250)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  Int
+
+  @@map("posts_ai")
 }
