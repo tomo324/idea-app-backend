@@ -13,7 +13,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
+  name      String   @db.VarChar(30)
   hash      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -23,24 +23,26 @@ model User {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String?  @db.VarChar(80)
-  content   String   @db.VarChar(250)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
+  id                 Int               @id @default(autoincrement())
+  title              String?           @db.VarChar(80)
+  content            String            @db.VarChar(250)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  author             User              @relation(fields: [authorId], references: [id])
+  authorId           Int
+  ai_generated_posts AiGeneratedPost[]
 
   @@map("posts")
 }
 
-model PostAi {
+// PostとAiGeneratedPostは暗黙的な多対多の関係
+model AiGeneratedPost {
   id        Int      @id @default(autoincrement())
   title     String?  @db.VarChar(80)
   content   String   @db.VarChar(250)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  authorId  Int
+  posts     Post[]
 
-  @@map("posts_ai")
+  @@map("ai_generated_posts")
 }
