@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserWithoutHash } from '../interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -18,11 +19,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: { sub: number; email: string }) {
-    const user = await this.prisma.user.findUnique({
+    const user: UserWithoutHash | null = await this.prisma.user.findUnique({
       where: {
         id: payload.sub,
       },
     });
+    // ユーザーが存在しない場合はnullを返す
+    if (!user) {
+      return null;
+    }
     delete user.hash;
     return user;
   }
