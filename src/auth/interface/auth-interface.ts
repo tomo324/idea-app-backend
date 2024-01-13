@@ -1,4 +1,4 @@
-export interface UserWithoutHash {
+export interface UserOptionalHash {
   id: number;
   email: string;
   name: string;
