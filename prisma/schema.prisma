@@ -23,25 +23,34 @@ model User {
 }
 
 model Post {
-  id                 Int               @id @default(autoincrement())
-  content            String            @db.VarChar(250)
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  author             User              @relation(fields: [authorId], references: [id])
-  authorId           Int
-  ai_generated_posts AiGeneratedPost[]
+  id              Int            @id @default(autoincrement())
+  content         String         @db.VarChar(250)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  author          User           @relation(fields: [authorId], references: [id])
+  authorId        Int
+  post_to_aiposts PostToAipost[]
 
   @@map("posts")
 }
 
-// PostとAiGeneratedPostは暗黙的な多対多の関係
-model AiGeneratedPost {
-  id        Int      @id @default(autoincrement())
-  title     String?  @db.VarChar(80)
-  content   String   @db.VarChar(250)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  posts     Post[]
+model Aipost {
+  id              Int            @id @default(autoincrement())
+  content         String         @db.VarChar(250)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  post_to_aiposts PostToAipost[]
 
-  @@map("ai_generated_posts")
+  @@map("aiposts")
+}
+
+// 中間テーブル
+model PostToAipost {
+  id       Int    @id @default(autoincrement())
+  post     Post   @relation(fields: [postId], references: [id])
+  postId   Int
+  aipost   Aipost @relation(fields: [aipostId], references: [id])
+  aipostId Int
+
+  @@map("post_to_aiposts")
 }
