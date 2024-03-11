@@ -1,7 +1,4 @@
-import {
-  Test,
-  TestingModule,
-} from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -31,9 +28,7 @@ describe('AuthService', () => {
   };
 
   const mockJwtService = {
-    signAsync: jest
-      .fn()
-      .mockResolvedValue('signed-jwt-token'),
+    signAsync: jest.fn().mockResolvedValue('signed-jwt-token'),
   };
 
   const mockConfigService = {
@@ -41,40 +36,31 @@ describe('AuthService', () => {
   };
 
   // 外部ライブラリのモックを作成
-  (argon.hash as jest.Mock).mockReturnValue(
-    'argontest-hash',
-  );
+  (argon.hash as jest.Mock).mockReturnValue('argontest-hash');
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          AuthService,
-          {
-            provide: PrismaService,
-            useValue: mockPrismaService,
-          },
-          {
-            provide: JwtService,
-            useValue: mockJwtService,
-          },
-          {
-            provide: ConfigService,
-            useValue: mockConfigService,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+      ],
+    }).compile();
 
-    service =
-      module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(
-      PrismaService,
-    );
-    jwtService =
-      module.get<JwtService>(JwtService);
-    configService = module.get<ConfigService>(
-      ConfigService,
-    );
+    service = module.get<AuthService>(AuthService);
+    prismaService = module.get<PrismaService>(PrismaService);
+    jwtService = module.get<JwtService>(JwtService);
+    configService = module.get<ConfigService>(ConfigService);
   });
 
   describe('AuthService', () => {
@@ -93,9 +79,7 @@ describe('AuthService', () => {
 
       const result = await service.signup(dto);
 
-      expect(
-        prismaService.user.create,
-      ).toHaveBeenCalledWith({
+      expect(prismaService.user.create).toHaveBeenCalledWith({
         data: {
           email: dto.email,
           name: dto.name,
@@ -117,15 +101,11 @@ describe('AuthService', () => {
       };
 
       // 外部ライブラリのモックを作成
-      (argon.verify as jest.Mock).mockReturnValue(
-        true,
-      );
+      (argon.verify as jest.Mock).mockReturnValue(true);
 
       const result = await service.signin(dto);
 
-      expect(
-        prismaService.user.findUnique,
-      ).toHaveBeenCalledWith({
+      expect(prismaService.user.findUnique).toHaveBeenCalledWith({
         where: {
           email: dto.email,
         },
@@ -143,14 +123,9 @@ describe('AuthService', () => {
         email: 'test@example.com',
       };
 
-      const result = await service.signToken(
-        user.id,
-        user.email,
-      );
+      const result = await service.signToken(user.id, user.email);
 
-      expect(
-        jwtService.signAsync,
-      ).toHaveBeenCalledWith(
+      expect(jwtService.signAsync).toHaveBeenCalledWith(
         {
           sub: user.id,
           email: user.email,

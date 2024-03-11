@@ -1,7 +1,4 @@
-import {
-  Test,
-  TestingModule,
-} from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 
@@ -18,18 +15,15 @@ describe('AuthController', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [AuthController],
-        providers: [AuthService],
-      })
-        .overrideProvider(AuthService)
-        .useValue(mockAuthService)
-        .compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [AuthService],
+    })
+      .overrideProvider(AuthService)
+      .useValue(mockAuthService)
+      .compile();
 
-    controller = module.get<AuthController>(
-      AuthController,
-    );
+    controller = module.get<AuthController>(AuthController);
   });
 
   describe('AuthController', () => {
@@ -48,9 +42,7 @@ describe('AuthController', () => {
 
       const result = await controller.signup(dto);
 
-      expect(
-        mockAuthService.signup,
-      ).toHaveBeenCalledWith(dto);
+      expect(mockAuthService.signup).toHaveBeenCalledWith(dto);
 
       expect(result).toEqual({
         access_token: 'signed-jwt-token',
@@ -68,9 +60,7 @@ describe('AuthController', () => {
 
       const result = await controller.signin(dto);
 
-      expect(
-        mockAuthService.signin,
-      ).toHaveBeenCalledWith(dto);
+      expect(mockAuthService.signin).toHaveBeenCalledWith(dto);
 
       expect(result).toEqual({
         access_token: 'signed-jwt-token',

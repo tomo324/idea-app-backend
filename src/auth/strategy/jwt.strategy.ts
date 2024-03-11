@@ -1,7 +1,4 @@
-import {
-  ExtractJwt,
-  Strategy,
-} from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -9,32 +6,24 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserOptionalHash } from '../interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(
-  Strategy,
-  'jwt',
-) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     config: ConfigService,
     private prisma: PrismaService,
   ) {
     super({
-      jwtFromRequest:
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.get('JWT_SECRET'),
     });
   }
 
-  async validate(payload: {
-    sub: number;
-    email: string;
-  }) {
-    const user: UserOptionalHash | null =
-      await this.prisma.user.findUnique({
-        where: {
-          id: payload.sub,
-        },
-      });
+  async validate(payload: { sub: number; email: string }) {
+    const user: UserOptionalHash | null = await this.prisma.user.findUnique({
+      where: {
+        id: payload.sub,
+      },
+    });
     // ユーザーが存在しない場合はnullを返す
     if (!user) {
       return null;
