@@ -1,7 +1,4 @@
-import {
-  Test,
-  TestingModule,
-} from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from '../user.controller';
 import { UserService } from '../user.service';
 
@@ -21,18 +18,15 @@ describe('AuthController', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [UserController],
-        providers: [UserService],
-      })
-        .overrideProvider(UserService)
-        .useValue(mockUserService)
-        .compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [UserController],
+      providers: [UserService],
+    })
+      .overrideProvider(UserService)
+      .useValue(mockUserService)
+      .compile();
 
-    controller = module.get<UserController>(
-      UserController,
-    );
+    controller = module.get<UserController>(UserController);
   });
 
   describe('UserController', () => {
@@ -49,14 +43,9 @@ describe('AuthController', () => {
         name: 'test',
       };
 
-      const result = await controller.editUser(
-        userId,
-        dto,
-      );
+      const result = await controller.editUser(userId, dto);
 
-      expect(
-        mockUserService.editUser,
-      ).toHaveBeenCalledWith(userId, dto);
+      expect(mockUserService.editUser).toHaveBeenCalledWith(userId, dto);
 
       expect(result).toEqual({
         id: userId,
@@ -75,9 +64,7 @@ describe('AuthController', () => {
 
       await controller.deleteUser(userId);
 
-      expect(
-        mockUserService.deleteUser,
-      ).toHaveBeenCalledWith(userId);
+      expect(mockUserService.deleteUser).toHaveBeenCalledWith(userId);
     });
   });
 });

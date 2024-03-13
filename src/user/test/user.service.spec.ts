@@ -1,7 +1,4 @@
-import {
-  Test,
-  TestingModule,
-} from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -23,19 +20,17 @@ describe('UserService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        providers: [
-          UserService,
-          {
-            provide: PrismaService,
-            useValue: mockPrismaService,
-          },
-        ],
-      }).compile();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UserService,
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+      ],
+    }).compile();
 
-    service =
-      module.get<UserService>(UserService);
+    service = module.get<UserService>(UserService);
   });
 
   describe('UserService', () => {
@@ -52,14 +47,9 @@ describe('UserService', () => {
         name: 'Test User',
       };
 
-      const result = await service.editUser(
-        userId,
-        dto,
-      );
+      const result = await service.editUser(userId, dto);
 
-      expect(
-        mockPrismaService.user.update,
-      ).toHaveBeenCalledWith({
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { ...dto },
       });
@@ -80,9 +70,7 @@ describe('UserService', () => {
 
       await service.deleteUser(userId);
 
-      expect(
-        mockPrismaService.user.delete,
-      ).toHaveBeenCalledWith({
+      expect(mockPrismaService.user.delete).toHaveBeenCalledWith({
         where: { id: userId },
       });
     });

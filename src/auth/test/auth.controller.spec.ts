@@ -1,7 +1,4 @@
-import {
-  Test,
-  TestingModule,
-} from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 
@@ -9,27 +6,23 @@ describe('AuthController', () => {
   let controller: AuthController;
 
   const mockAuthService = {
-    signup: jest.fn().mockResolvedValue({
-      access_token: 'signed-jwt-token',
-    }),
-    signin: jest.fn().mockResolvedValue({
-      access_token: 'signed-jwt-token',
-    }),
+    signup: jest.fn().mockResolvedValue('signed-jwt-token'),
+    signin: jest.fn().mockResolvedValue('signed-jwt-token'),
+  };
+  const mockRes = {
+    cookie: jest.fn(),
   };
 
   beforeEach(async () => {
-    const module: TestingModule =
-      await Test.createTestingModule({
-        controllers: [AuthController],
-        providers: [AuthService],
-      })
-        .overrideProvider(AuthService)
-        .useValue(mockAuthService)
-        .compile();
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [AuthService],
+    })
+      .overrideProvider(AuthService)
+      .useValue(mockAuthService)
+      .compile();
 
-    controller = module.get<AuthController>(
-      AuthController,
-    );
+    controller = module.get<AuthController>(AuthController);
   });
 
   describe('AuthController', () => {
@@ -46,15 +39,17 @@ describe('AuthController', () => {
         name: 'Test User',
       };
 
-      const result = await controller.signup(dto);
+      await controller.signup(dto, mockRes as any);
 
-      expect(
-        mockAuthService.signup,
-      ).toHaveBeenCalledWith(dto);
-
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(mockAuthService.signup).toHaveBeenCalledWith(dto);
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'signed-jwt-token',
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+        },
+      );
     });
   });
 
@@ -66,15 +61,17 @@ describe('AuthController', () => {
         name: 'Test User',
       };
 
-      const result = await controller.signin(dto);
+      await controller.signin(dto, mockRes as any);
 
-      expect(
-        mockAuthService.signin,
-      ).toHaveBeenCalledWith(dto);
-
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(mockAuthService.signin).toHaveBeenCalledWith(dto);
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'signed-jwt-token',
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+        },
+      );
     });
   });
 });
