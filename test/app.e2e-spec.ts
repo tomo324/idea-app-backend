@@ -1,7 +1,4 @@
-import {
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
@@ -14,23 +11,18 @@ describe('App e2e', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
-    const moduleRef =
-      await Test.createTestingModule({
-        imports: [AppModule],
-      }).compile();
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
     app = moduleRef.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true }),
-    );
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
     await app.init();
     await app.listen(3333);
 
     prisma = app.get(PrismaService);
     await prisma.cleanDb();
-    pactum.request.setBaseUrl(
-      'http://localhost:3333',
-    );
+    pactum.request.setBaseUrl('http://localhost:3333');
   });
 
   afterAll(() => {
@@ -75,10 +67,7 @@ describe('App e2e', () => {
           .expectStatus(400);
       });
       it('should throw if no body provided', () => {
-        return pactum
-          .spec()
-          .post('/auth/signup')
-          .expectStatus(400);
+        return pactum.spec().post('/auth/signup').expectStatus(400);
       });
       it('should signup', () => {
         return pactum
@@ -111,18 +100,17 @@ describe('App e2e', () => {
           .expectStatus(400);
       });
       it('should throw if no body provided', () => {
-        return pactum
-          .spec()
-          .post('/auth/signin')
-          .expectStatus(400);
+        return pactum.spec().post('/auth/signin').expectStatus(400);
       });
-      it('should signin', () => {
-        return pactum
+
+      // TODO ここでsigninしてcookieにaccess_tokenを保存する
+      it('should signin', async () => {
+        const res = await pactum
           .spec()
           .post('/auth/signin')
           .withBody(dto)
-          .expectStatus(200)
-          .stores('userAt', 'access_token');
+          .expectStatus(200);
+        //.stores('userAt', 'access_token');
       });
     });
   });
@@ -138,7 +126,7 @@ describe('App e2e', () => {
           .spec()
           .get('/users/me')
           .withHeaders({
-            Authorization: 'Bearer $S{userAt}',
+            Cookie: 'access_token=$S{userAt}',
           })
           .expectStatus(200);
       });
@@ -150,7 +138,7 @@ describe('App e2e', () => {
           .spec()
           .patch('/users')
           .withHeaders({
-            Authorization: 'Bearer $S{userAt}',
+            Cookie: 'access_token=$S{userAt}',
           })
           .withBody(dto)
           .expectStatus(200)
@@ -165,7 +153,7 @@ describe('App e2e', () => {
           .spec()
           .delete('/users')
           .withHeaders({
-            Authorization: 'Bearer $S{userAt}',
+            Cookie: 'access_token=$S{userAt}',
           })
           .withBody(dto)
           .expectStatus(200);
@@ -176,7 +164,7 @@ describe('App e2e', () => {
           .spec()
           .get('/users/me')
           .withHeaders({
-            Authorization: 'Bearer $S{userAt}',
+            Cookie: 'access_token=$S{userAt}',
           })
           .expectStatus(401);
       });

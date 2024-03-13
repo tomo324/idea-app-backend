@@ -4,6 +4,11 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
+  const devOrigins = ['http://localhost:3000'];
+  const prodOrigins = ['https://aidea-park.vercel.app'];
+
+  const origins =
+    process.env.NODE_ENV === 'production' ? prodOrigins : devOrigins;
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.useGlobalPipes(
@@ -12,7 +17,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: 'http://localhost:3000', // TODO 本番環境では変更する
+    origin: origins,
     credentials: true,
   });
   await app.listen(3333);
