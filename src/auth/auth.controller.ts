@@ -23,7 +23,7 @@ export class AuthController {
     const access_token = await this.authService.signup(dto);
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
+      secure: process.env.NODE_ENV === 'production',
     });
   }
 
@@ -36,7 +36,7 @@ export class AuthController {
     const access_token = await this.authService.signin(dto);
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
+      secure: process.env.NODE_ENV === 'production',
     });
   }
 }
