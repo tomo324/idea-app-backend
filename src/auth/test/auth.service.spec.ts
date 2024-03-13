@@ -11,7 +11,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let prismaService: PrismaService;
   let jwtService: JwtService;
-  let configService: ConfigService;
+  //let configService: ConfigService;
 
   const mockPrismaService = {
     user: {
@@ -60,7 +60,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     prismaService = module.get<PrismaService>(PrismaService);
     jwtService = module.get<JwtService>(JwtService);
-    configService = module.get<ConfigService>(ConfigService);
+    //configService = module.get<ConfigService>(ConfigService);
   });
 
   describe('AuthService', () => {
@@ -86,9 +86,7 @@ describe('AuthService', () => {
           hash: expect.any(String),
         },
       });
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(result).toEqual('signed-jwt-token');
     });
   });
 
@@ -110,9 +108,7 @@ describe('AuthService', () => {
           email: dto.email,
         },
       });
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(result).toEqual('signed-jwt-token');
     });
   });
 
@@ -136,9 +132,7 @@ describe('AuthService', () => {
         },
       );
 
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(result).toEqual('signed-jwt-token');
     });
   });
 });

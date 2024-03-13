@@ -6,12 +6,11 @@ describe('AuthController', () => {
   let controller: AuthController;
 
   const mockAuthService = {
-    signup: jest.fn().mockResolvedValue({
-      access_token: 'signed-jwt-token',
-    }),
-    signin: jest.fn().mockResolvedValue({
-      access_token: 'signed-jwt-token',
-    }),
+    signup: jest.fn().mockResolvedValue('signed-jwt-token'),
+    signin: jest.fn().mockResolvedValue('signed-jwt-token'),
+  };
+  const mockRes = {
+    cookie: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -40,13 +39,17 @@ describe('AuthController', () => {
         name: 'Test User',
       };
 
-      const result = await controller.signup(dto);
+      await controller.signup(dto, mockRes as any);
 
       expect(mockAuthService.signup).toHaveBeenCalledWith(dto);
-
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'signed-jwt-token',
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+        },
+      );
     });
   });
 
@@ -58,13 +61,17 @@ describe('AuthController', () => {
         name: 'Test User',
       };
 
-      const result = await controller.signin(dto);
+      await controller.signin(dto, mockRes as any);
 
       expect(mockAuthService.signin).toHaveBeenCalledWith(dto);
-
-      expect(result).toEqual({
-        access_token: 'signed-jwt-token',
-      });
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'signed-jwt-token',
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+        },
+      );
     });
   });
 });
