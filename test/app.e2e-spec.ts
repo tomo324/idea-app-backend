@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import * as pactum from 'pactum';
 import { SignupDto, SigninDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
+//import axios from 'axios';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -106,8 +107,8 @@ describe('App e2e', () => {
       });
 
       // TODO ここでsigninしてcookieにaccess_tokenを保存する
-      it('should signin', async () => {
-        const res = await pactum
+      it('should signin', () => {
+        return pactum
           .spec()
           .post('/auth/signin')
           .withBody(signinDto)
@@ -118,18 +119,36 @@ describe('App e2e', () => {
   });
 
   describe('User', () => {
+    let cookie: any;
+
     const dto: EditUserDto = {
       email: 'tomo2@gmail.com',
       name: 'tomo2',
     };
+
+    const signinDto: SigninDto = {
+      email: 'tomoo@gmail.com',
+      password: '123456',
+    };
+
+    // TODO set-cookieヘッダーはauth.controllerでは確認できるが、テスト側では確認できない
+    it('get cookie', async () => {
+      await pactum
+        .spec()
+        .post('/auth/signin')
+        .withBody(signinDto)
+        .returns((ctx) => {
+          console.log(ctx.res.headers);
+          cookie = ctx.res.headers['set-cookie'];
+        });
+    });
+
     describe('Get me', () => {
       it('should get current user', () => {
         return pactum
           .spec()
           .get('/users/me')
-          .withHeaders({
-            Cookie: 'access_token=$S{userAt}',
-          })
+          .withCookies(cookie[0])
           .expectStatus(200);
       });
     });
@@ -139,9 +158,7 @@ describe('App e2e', () => {
         return pactum
           .spec()
           .patch('/users')
-          .withHeaders({
-            Cookie: 'access_token=$S{userAt}',
-          })
+          .withCookies(cookie[0])
           .withBody(dto)
           .expectStatus(200)
           .expectBodyContains(dto.email)
@@ -154,9 +171,7 @@ describe('App e2e', () => {
         return pactum
           .spec()
           .delete('/users')
-          .withHeaders({
-            Cookie: 'access_token=$S{userAt}',
-          })
+          .withCookies(cookie[0])
           .withBody(dto)
           .expectStatus(200);
       });
@@ -165,9 +180,7 @@ describe('App e2e', () => {
         return pactum
           .spec()
           .get('/users/me')
-          .withHeaders({
-            Cookie: 'access_token=$S{userAt}',
-          })
+          .withCookies(cookie[0])
           .expectStatus(401);
       });
     });
