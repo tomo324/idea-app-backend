@@ -58,7 +58,6 @@ describe('AuthController', () => {
       const dto = {
         email: 'test@example.com',
         password: 'test123',
-        name: 'Test User',
       };
 
       await controller.signin(dto, mockRes as any);
