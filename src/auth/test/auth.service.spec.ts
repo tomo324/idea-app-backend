@@ -95,7 +95,6 @@ describe('AuthService', () => {
       const dto = {
         email: 'test@example.com',
         password: 'test123',
-        name: 'Test User',
       };
 
       // 外部ライブラリのモックを作成

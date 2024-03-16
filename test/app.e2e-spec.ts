@@ -3,7 +3,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import * as pactum from 'pactum';
-import { AuthDto } from 'src/auth/dto';
+import { SignupDto, SigninDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
 
 describe('App e2e', () => {
@@ -30,19 +30,19 @@ describe('App e2e', () => {
   });
 
   describe('Auth', () => {
-    const dto: AuthDto = {
-      email: 'tomo@gmail.com',
-      password: '123456',
-      name: 'tomo',
-    };
     describe('Signup', () => {
+      const signupDto: SignupDto = {
+        email: 'tomo@gmail.com',
+        password: '123456',
+        name: 'tomo',
+      };
       it('should throw if email empty', () => {
         return pactum
           .spec()
           .post('/auth/signup')
           .withBody({
-            password: dto.password,
-            name: dto.name,
+            password: signupDto.password,
+            name: signupDto.name,
           })
           .expectStatus(400);
       });
@@ -51,8 +51,8 @@ describe('App e2e', () => {
           .spec()
           .post('/auth/signup')
           .withBody({
-            email: dto.email,
-            name: dto.name,
+            email: signupDto.email,
+            name: signupDto.name,
           })
           .expectStatus(400);
       });
@@ -61,8 +61,8 @@ describe('App e2e', () => {
           .spec()
           .post('/auth/signup')
           .withBody({
-            email: dto.email,
-            password: dto.password,
+            email: signupDto.email,
+            password: signupDto.password,
           })
           .expectStatus(400);
       });
@@ -73,19 +73,22 @@ describe('App e2e', () => {
         return pactum
           .spec()
           .post('/auth/signup')
-          .withBody(dto)
+          .withBody(signupDto)
           .expectStatus(201);
       });
     });
 
     describe('Signin', () => {
+      const signinDto: SigninDto = {
+        email: 'tomo@gmail.com',
+        password: '123456',
+      };
       it('should throw if email empty', () => {
         return pactum
           .spec()
           .post('/auth/signin')
           .withBody({
-            password: dto.password,
-            name: dto.name,
+            password: signinDto.password,
           })
           .expectStatus(400);
       });
@@ -94,8 +97,7 @@ describe('App e2e', () => {
           .spec()
           .post('/auth/signin')
           .withBody({
-            email: dto.email,
-            name: dto.name,
+            email: signinDto.email,
           })
           .expectStatus(400);
       });
@@ -108,7 +110,7 @@ describe('App e2e', () => {
         const res = await pactum
           .spec()
           .post('/auth/signin')
-          .withBody(dto)
+          .withBody(signinDto)
           .expectStatus(200);
         //.stores('userAt', 'access_token');
       });

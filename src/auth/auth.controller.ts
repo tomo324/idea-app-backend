@@ -7,8 +7,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
 import { Response } from 'express';
+import { SigninDto, SignupDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,7 +17,7 @@ export class AuthController {
   // jwtをcookieに保存する
   @Post('signup')
   async signup(
-    @Body() dto: AuthDto,
+    @Body() dto: SignupDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const access_token = await this.authService.signup(dto);
@@ -30,7 +30,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('signin')
   async signin(
-    @Body() dto: AuthDto,
+    @Body() dto: SigninDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const access_token = await this.authService.signin(dto);
