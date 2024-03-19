@@ -21,9 +21,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const access_token = await this.authService.signup(dto);
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     });
   }
 
@@ -34,9 +36,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const access_token = await this.authService.signin(dto);
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     });
   }
 }
