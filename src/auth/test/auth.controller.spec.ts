@@ -32,7 +32,7 @@ describe('AuthController', () => {
   });
 
   describe('signup', () => {
-    it('should call singup function in service and return the access_token', async () => {
+    it('should call singup function in service and return the accessToken', async () => {
       const dto = {
         email: 'test@example.com',
         password: 'test123',
@@ -43,7 +43,7 @@ describe('AuthController', () => {
 
       expect(mockAuthService.signup).toHaveBeenCalledWith(dto);
       expect(mockRes.cookie).toHaveBeenCalledWith(
-        'access_token',
+        'accessToken',
         'signed-jwt-token',
         {
           httpOnly: true,
@@ -55,7 +55,7 @@ describe('AuthController', () => {
   });
 
   describe('signin', () => {
-    it('should call signin function and return the access_token', async () => {
+    it('should call signin function and return the accessToken', async () => {
       const dto = {
         email: 'test@example.com',
         password: 'test123',
@@ -65,7 +65,7 @@ describe('AuthController', () => {
 
       expect(mockAuthService.signin).toHaveBeenCalledWith(dto);
       expect(mockRes.cookie).toHaveBeenCalledWith(
-        'access_token',
+        'accessToken',
         'signed-jwt-token',
         {
           httpOnly: true,
