@@ -5,11 +5,12 @@ import { AppModule } from '../src/app.module';
 import * as pactum from 'pactum';
 import { SignupDto, SigninDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
-//import axios from 'axios';
+import * as cookieParser from 'cookie-parser';
 
 describe('App e2e', () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let cookie: any;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -17,6 +18,7 @@ describe('App e2e', () => {
     }).compile();
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.use(cookieParser());
 
     await app.init();
     await app.listen(3333);
@@ -106,42 +108,25 @@ describe('App e2e', () => {
         return pactum.spec().post('/auth/signin').expectStatus(400);
       });
 
-      // TODO ここでsigninしてcookieにaccess_tokenを保存する
       it('should signin', () => {
         return pactum
           .spec()
           .post('/auth/signin')
           .withBody(signinDto)
+          .returns((ctx) => {
+            console.log(ctx.res.headers);
+            cookie = ctx.res.headers['set-cookie'];
+          })
           .expectStatus(200);
-        //.stores('userAt', 'access_token');
       });
     });
   });
 
   describe('User', () => {
-    let cookie: any;
-
     const dto: EditUserDto = {
       email: 'tomo2@gmail.com',
       name: 'tomo2',
     };
-
-    const signinDto: SigninDto = {
-      email: 'tomoo@gmail.com',
-      password: '123456',
-    };
-
-    // TODO set-cookieヘッダーはauth.controllerでは確認できるが、テスト側では確認できない
-    it('get cookie', async () => {
-      await pactum
-        .spec()
-        .post('/auth/signin')
-        .withBody(signinDto)
-        .returns((ctx) => {
-          console.log(ctx.res.headers);
-          cookie = ctx.res.headers['set-cookie'];
-        });
-    });
 
     describe('Get me', () => {
       it('should get current user', () => {
