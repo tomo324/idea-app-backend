@@ -20,9 +20,9 @@ export class AuthController {
     @Body() dto: SignupDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const access_token = await this.authService.signup(dto);
+    const accessToken = await this.authService.signup(dto);
     const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('access_token', access_token, {
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
@@ -35,9 +35,9 @@ export class AuthController {
     @Body() dto: SigninDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const access_token = await this.authService.signin(dto);
+    const accessToken = await this.authService.signin(dto);
     const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('access_token', access_token, {
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
