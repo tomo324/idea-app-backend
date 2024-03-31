@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { CorsMiddleware } from './middleware';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CorsMiddleware } from './middleware';
     PrismaModule,
     PrismaModule,
     UserModule,
+    PostModule,
   ],
   providers: [PrismaService],
 })
