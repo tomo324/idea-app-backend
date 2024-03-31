@@ -28,7 +28,7 @@ describe('PostController', () => {
       content: 'test content',
       authorId: 1,
     }),
-    getManyPostsByUserId: jest.fn().mockResolvedValue([
+    getMyPosts: jest.fn().mockResolvedValue([
       {
         id: 1,
         content: 'test content',
@@ -109,12 +109,12 @@ describe('PostController', () => {
       authorId: 1,
     });
   });
-  it('getManyPostsByUserIdメソッドが呼ばれ、post一覧が返されること', async () => {
+  it('getMyPostsメソッドが呼ばれ、post一覧が返されること', async () => {
     const userId = 1;
 
-    const result = await controller.getManyPostsByUserId(userId);
+    const result = await controller.getMyPosts(userId);
 
-    expect(mockPostService.getManyPostsByUserId).toHaveBeenCalledWith(userId);
+    expect(mockPostService.getMyPosts).toHaveBeenCalledWith(userId);
 
     expect(result).toEqual([
       {
@@ -130,10 +130,11 @@ describe('PostController', () => {
     ]);
   });
   it('deletePostメソッドが呼ばれること', async () => {
+    const userId = 1;
     const postId = 1;
 
-    await controller.deletePost(postId);
+    await controller.deletePost(userId, postId);
 
-    expect(mockPostService.deletePost).toHaveBeenCalledWith(postId);
+    expect(mockPostService.deletePost).toHaveBeenCalledWith(userId, postId);
   });
 });

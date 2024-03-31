@@ -8,12 +8,12 @@ describe('PostService', () => {
 
   const mockPrismaService = {
     post: {
-      createPost: jest.fn().mockResolvedValue({
+      create: jest.fn().mockResolvedValue({
         id: 1,
         content: 'test content',
         authorId: 1,
       }),
-      getManyPosts: jest.fn().mockResolvedValue([
+      findMany: jest.fn().mockResolvedValue([
         {
           id: 1,
           content: 'test content',
@@ -25,24 +25,12 @@ describe('PostService', () => {
           authorId: 1,
         },
       ]),
-      getOnePost: jest.fn().mockResolvedValue({
+      findUnique: jest.fn().mockResolvedValue({
         id: 1,
         content: 'test content',
         authorId: 1,
       }),
-      getManyPostsByUserId: jest.fn().mockResolvedValue([
-        {
-          id: 1,
-          content: 'test content',
-          authorId: 1,
-        },
-        {
-          id: 2,
-          content: 'test content',
-          authorId: 1,
-        },
-      ]),
-      deletePost: jest.fn(),
+      delete: jest.fn(),
     },
   };
 
@@ -107,9 +95,9 @@ describe('PostService', () => {
       authorId: 1,
     });
   });
-  it('特定のユーザーの投稿を複数取得でき、取得した投稿を返すこと', async () => {
+  it('自分の投稿を複数取得でき、取得した投稿を返すこと', async () => {
     const userId = 1;
-    const result = await service.getManyPostsByUserId(userId);
+    const result = await service.getMyPosts(userId);
     expect(prismaService.post.findMany).toHaveBeenCalledWith({
       where: { authorId: userId },
     });
@@ -127,8 +115,9 @@ describe('PostService', () => {
     ]);
   });
   it('投稿を削除できること', async () => {
+    const userId = 1;
     const postId = 1;
-    await service.deletePost(postId);
+    await service.deletePost(userId, postId);
     expect(prismaService.post.delete).toHaveBeenCalledWith({
       where: { id: postId },
     });
