@@ -20,24 +20,24 @@ import { GetUser } from 'src/auth/decorator';
 export class PostController {
   constructor(private postService: PostService) {}
 
-  @Post('create')
-  createPost(@GetUser('id') userId: number, @Body() dto: CreatePostDto) {
-    return this.postService.createPost(userId, dto);
-  }
-
   @Get()
   getManyPosts() {
     return this.postService.getManyPosts();
   }
 
-  @Get(':id')
-  getOnePost(@Param('id', ParseIntPipe) postId: number) {
-    return this.postService.getOnePost(postId);
+  @Post('create')
+  createPost(@GetUser('id') userId: number, @Body() dto: CreatePostDto) {
+    return this.postService.createPost(userId, dto);
   }
 
   @Get('my-posts')
   getMyPosts(@GetUser('id') userId: number) {
     return this.postService.getMyPosts(userId);
+  }
+
+  @Get(':id')
+  getOnePost(@Param('id', ParseIntPipe) postId: number) {
+    return this.postService.getOnePost(postId);
   }
 
   @HttpCode(HttpStatus.OK)
