@@ -114,7 +114,6 @@ describe('App e2e', () => {
           .post('/auth/signin')
           .withBody(signinDto)
           .returns((ctx) => {
-            console.log(ctx.res.headers);
             cookie = ctx.res.headers['set-cookie'];
           })
           .expectStatus(200);
@@ -141,6 +140,11 @@ describe('App e2e', () => {
           .post('/posts/create')
           .withCookies(cookie[0])
           .withBody(postDto)
+          .stores((request, response) => {
+            return {
+              postId: response.body.id,
+            };
+          })
           .expectStatus(201);
       });
     });
@@ -157,12 +161,12 @@ describe('App e2e', () => {
       it('postのidからpostを取得できること', () => {
         return pactum
           .spec()
-          .get('/posts/1')
+          .get('/posts/$S{postId}')
           .withCookies(cookie[0])
           .expectStatus(200);
       });
 
-      it('ユーザーの投稿一覧を取得できること', () => {
+      it('自分の投稿一覧を取得できること', () => {
         return pactum
           .spec()
           .get('/posts/my-posts')
@@ -175,7 +179,7 @@ describe('App e2e', () => {
       it('postを削除できること', () => {
         return pactum
           .spec()
-          .delete('/posts/1')
+          .delete('/posts/$S{postId}')
           .withCookies(cookie[0])
           .expectStatus(200);
       });
