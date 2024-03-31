@@ -17,9 +17,11 @@ export class UserService {
     return user;
   }
 
+  // 外部キー制約のため、ユーザーの投稿から削除する必要がある
   async deleteUser(userId: number) {
-    await this.prisma.user.delete({
-      where: { id: userId },
-    });
+    await this.prisma.$transaction([
+      this.prisma.post.deleteMany({ where: { authorId: userId } }),
+      this.prisma.user.delete({ where: { id: userId } }),
+    ]);
   }
 }
