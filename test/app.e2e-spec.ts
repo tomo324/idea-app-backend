@@ -39,7 +39,7 @@ describe('App e2e', () => {
         password: '123456',
         name: 'tomo',
       };
-      it('should throw if email empty', () => {
+      it('メールが空の場合、エラーになること', () => {
         return pactum
           .spec()
           .post('/auth/signup')
@@ -49,7 +49,7 @@ describe('App e2e', () => {
           })
           .expectStatus(400);
       });
-      it('should throw if password empty', () => {
+      it('パスワードが空の場合、エラーになること', () => {
         return pactum
           .spec()
           .post('/auth/signup')
@@ -59,7 +59,7 @@ describe('App e2e', () => {
           })
           .expectStatus(400);
       });
-      it('should throw if name empty', () => {
+      it('名前が空の場合、エラーになること', () => {
         return pactum
           .spec()
           .post('/auth/signup')
@@ -69,10 +69,10 @@ describe('App e2e', () => {
           })
           .expectStatus(400);
       });
-      it('should throw if no body provided', () => {
+      it('リクエストボディが与えられない場合、エラーになること', () => {
         return pactum.spec().post('/auth/signup').expectStatus(400);
       });
-      it('should signup', () => {
+      it('サインアップができること', () => {
         return pactum
           .spec()
           .post('/auth/signup')
@@ -86,7 +86,7 @@ describe('App e2e', () => {
         email: 'tomo@gmail.com',
         password: '123456',
       };
-      it('should throw if email empty', () => {
+      it('メールが空の場合、エラーになること', () => {
         return pactum
           .spec()
           .post('/auth/signin')
@@ -95,7 +95,7 @@ describe('App e2e', () => {
           })
           .expectStatus(400);
       });
-      it('should throw if password empty', () => {
+      it('パスワードが空の場合、エラーになること', () => {
         return pactum
           .spec()
           .post('/auth/signin')
@@ -104,19 +104,83 @@ describe('App e2e', () => {
           })
           .expectStatus(400);
       });
-      it('should throw if no body provided', () => {
+      it('リクエストボディが与えられない場合、エラーになること', () => {
         return pactum.spec().post('/auth/signin').expectStatus(400);
       });
 
-      it('should signin', () => {
+      it('サインインができること', () => {
         return pactum
           .spec()
           .post('/auth/signin')
           .withBody(signinDto)
           .returns((ctx) => {
-            console.log(ctx.res.headers);
             cookie = ctx.res.headers['set-cookie'];
           })
+          .expectStatus(200);
+      });
+    });
+  });
+
+  describe('Post', () => {
+    const postDto = {
+      content: 'test',
+    };
+    describe('Create', () => {
+      it('postが空の場合、エラーになること', () => {
+        return pactum
+          .spec()
+          .post('/posts/create')
+          .withCookies(cookie[0])
+          .expectStatus(400);
+      });
+
+      it('postを投稿できること', () => {
+        return pactum
+          .spec()
+          .post('/posts/create')
+          .withCookies(cookie[0])
+          .withBody(postDto)
+          .stores((request, response) => {
+            return {
+              postId: response.body.id,
+            };
+          })
+          .expectStatus(201);
+      });
+    });
+
+    describe('Get', () => {
+      it('post一覧を取得できること', () => {
+        return pactum
+          .spec()
+          .get('/posts')
+          .withCookies(cookie[0])
+          .expectStatus(200);
+      });
+
+      it('postのidからpostを取得できること', () => {
+        return pactum
+          .spec()
+          .get('/posts/$S{postId}')
+          .withCookies(cookie[0])
+          .expectStatus(200);
+      });
+
+      it('自分の投稿一覧を取得できること', () => {
+        return pactum
+          .spec()
+          .get('/posts/my-posts')
+          .withCookies(cookie[0])
+          .expectStatus(200);
+      });
+    });
+
+    describe('Delete', () => {
+      it('postを削除できること', () => {
+        return pactum
+          .spec()
+          .delete('/posts/$S{postId}')
+          .withCookies(cookie[0])
           .expectStatus(200);
       });
     });
@@ -129,7 +193,7 @@ describe('App e2e', () => {
     };
 
     describe('Get me', () => {
-      it('should get current user', () => {
+      it('現在のユーザー情報を取得できること', () => {
         return pactum
           .spec()
           .get('/users/me')
@@ -139,7 +203,7 @@ describe('App e2e', () => {
     });
 
     describe('Edit user', () => {
-      it('should edit user', () => {
+      it('ユーザー情報を編集できること', () => {
         return pactum
           .spec()
           .patch('/users')
@@ -152,7 +216,7 @@ describe('App e2e', () => {
     });
 
     describe('Delete user', () => {
-      it('should delete user', () => {
+      it('ユーザーを削除できること', () => {
         return pactum
           .spec()
           .delete('/users')
@@ -161,7 +225,7 @@ describe('App e2e', () => {
           .expectStatus(200);
       });
 
-      it('should not get current user', () => {
+      it('削除されたユーザー情報を取得できないこと', () => {
         return pactum
           .spec()
           .get('/users/me')

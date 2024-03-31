@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('UserService', () => {
   let service: UserService;
+  let prismaService: PrismaService;
 
   const mockPrismaService = {
     user: {
@@ -17,6 +18,10 @@ describe('UserService', () => {
       }),
       delete: jest.fn(),
     },
+    post: { deleteMany: jest.fn() },
+    $transaction: jest
+      .fn()
+      .mockImplementation((promises) => Promise.all(promises)),
   };
 
   beforeEach(async () => {
@@ -31,6 +36,7 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserService>(UserService);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   describe('UserService', () => {
@@ -49,7 +55,7 @@ describe('UserService', () => {
 
       const result = await service.editUser(userId, dto);
 
-      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+      expect(prismaService.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { ...dto },
       });
@@ -70,9 +76,10 @@ describe('UserService', () => {
 
       await service.deleteUser(userId);
 
-      expect(mockPrismaService.user.delete).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
+      expect(prismaService.$transaction).toHaveBeenCalledWith([
+        prismaService.post.deleteMany({ where: { authorId: userId } }),
+        prismaService.user.delete({ where: { id: userId } }),
+      ]);
     });
   });
 });
