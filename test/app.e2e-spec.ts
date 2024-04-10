@@ -198,7 +198,19 @@ describe('App e2e', () => {
           .spec()
           .get('/users/me')
           .withCookies(cookie[0])
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('userId', 'id');
+      });
+    });
+
+    describe('Get username by id', () => {
+      it('idからユーザー名を取得できること', () => {
+        return pactum
+          .spec()
+          .get('/users/$S{userId}')
+          .withCookies(cookie[0])
+          .expectStatus(200)
+          .expectBodyContains('tomo');
       });
     });
 
