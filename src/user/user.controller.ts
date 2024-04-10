@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Patch,
   UseGuards,
 } from '@nestjs/common';
@@ -33,5 +35,10 @@ export class UserController {
   @Delete()
   deleteUser(@GetUser('id') userId: number) {
     return this.userService.deleteUser(userId);
+  }
+
+  @Get(':id')
+  getUserNameById(@Param('id', ParseIntPipe) userId: number) {
+    return this.userService.getUserNameById(userId);
   }
 }
