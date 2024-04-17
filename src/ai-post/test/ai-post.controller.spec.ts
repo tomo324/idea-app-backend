@@ -51,9 +51,7 @@ describe('AiPostController', () => {
       content: 'test AI content',
     };
     const result = await controller.createAiPost(createAiPostDto);
-    expect(service.createAiPost).toHaveBeenCalledWith(
-      createAiPostDto,
-    );
+    expect(service.createAiPost).toHaveBeenCalledWith(createAiPostDto);
     expect(result).toEqual({ id: 1, content: 'test AI content' });
   });
 

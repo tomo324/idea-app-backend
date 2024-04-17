@@ -27,6 +27,16 @@ describe('AiPostService', () => {
         id: 1,
         content: 'test AI content',
       }),
+      findMany: jest.fn().mockResolvedValue([
+        {
+          id: 1,
+          content: 'test AI content',
+        },
+        {
+          id: 2,
+          content: 'test AI content',
+        },
+      ]),
     },
   };
 
@@ -87,5 +97,20 @@ describe('AiPostService', () => {
       id: 1,
       content: 'test AI content',
     });
+  });
+
+  it('AI投稿を取得できること', async () => {
+    const result = await service.getManyAiPosts();
+    expect(prismaService.aipost.findMany).toHaveBeenCalled();
+    expect(result).toEqual([
+      {
+        id: 1,
+        content: 'test AI content',
+      },
+      {
+        id: 2,
+        content: 'test AI content',
+      },
+    ]);
   });
 });
