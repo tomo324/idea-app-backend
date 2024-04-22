@@ -22,8 +22,7 @@ import { AiPostModule } from './ai-post/ai-post.module';
     PostModule,
     AiPostModule,
   ],
-  providers: [PrismaService, AiPostService],
-  controllers: [AiPostController],
+  providers: [PrismaService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
