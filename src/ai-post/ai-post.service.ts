@@ -4,16 +4,12 @@ import { CreateAiPostDto } from './dto';
 import prismaRandom from 'prisma-extension-random';
 import OpenAI from 'openai';
 import * as deepl from 'deepl-node';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AiPostService {
   private prisma;
 
-  constructor(
-    private config: ConfigService,
-    private prismaService: PrismaService,
-  ) {
+  constructor(private prismaService: PrismaService) {
     this.prisma = this.prismaService.$extends(prismaRandom());
   }
 
@@ -74,7 +70,10 @@ export class AiPostService {
   }
 
   async translateTextToEnglish(text: string) {
-    const deeplAuthKey = this.config.get('DEEPL_API_KEY');
+    const deeplAuthKey = process.env.DEEPL_API_KEY;
+    if (!deeplAuthKey) {
+      throw new Error('DEEPL_API_KEY is not set');
+    }
     const translator = new deepl.Translator(deeplAuthKey);
     try {
       const result = await translator.translateText(text, null, 'en-US');
@@ -85,7 +84,10 @@ export class AiPostService {
   }
 
   async translateTextToJapanese(text: string) {
-    const deeplAuthKey = this.config.get('DEEPL_API_KEY');
+    const deeplAuthKey = process.env.DEEPL_API_KEY;
+    if (!deeplAuthKey) {
+      throw new Error('DEEPL_API_KEY is not set');
+    }
     const translator = new deepl.Translator(deeplAuthKey);
     try {
       const result = await translator.translateText(text, null, 'ja');
@@ -97,8 +99,11 @@ export class AiPostService {
 
   async useChatGPT(firstPost: string, secondPost: string) {
     const openai = new OpenAI({
-      apiKey: this.config.get('CHATGPT_API_KEY'),
+      apiKey: process.env.CHATGPT_API_KEY,
     });
+    if (!openai) {
+      throw new Error('CHATGPT_API_KEY is not set');
+    }
     const gpt_prompt =
       'Combine the two ideas above to create a new idea. Answer in 230 characters or less.';
     try {
