@@ -17,11 +17,17 @@ export class AiPostService {
     // 投稿をランダムに取得する
     // TODO 型エラーを直す
     const posts: any = await this.prisma.post.findManyRandom(2, {
-      select: { id: true, content: true },
+      select: { id: true, content: true, authorId: true },
     });
     if (posts.length < 2) {
       throw new Error('Not enough posts to generate AI post');
     }
+
+    const originalPosts = posts.map(
+      (post: { id: number; content: string; authorId: number }) => {
+        return { id: post.id, content: post.content, authorId: post.authorId };
+      },
+    );
 
     // 投稿を英語に翻訳する
     const translatedFirstPost = await this.translateTextToEnglish(
@@ -44,7 +50,7 @@ export class AiPostService {
     const translatedChatGPTResponse =
       await this.translateTextToJapanese(chatGPTResponse);
 
-    return { content: translatedChatGPTResponse };
+    return { content: translatedChatGPTResponse, originalPosts };
   }
 
   async createAiPost(dto: CreateAiPostDto) {
