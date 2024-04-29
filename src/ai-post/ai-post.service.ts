@@ -4,6 +4,7 @@ import { CreateAiPostDto } from './dto';
 import prismaRandom from 'prisma-extension-random';
 import OpenAI from 'openai';
 import * as deepl from 'deepl-node';
+import { Post } from 'src/post/interface';
 
 @Injectable()
 export class AiPostService {
@@ -17,17 +18,27 @@ export class AiPostService {
     // 投稿をランダムに取得する
     // TODO 型エラーを直す
     const posts: any = await this.prisma.post.findManyRandom(2, {
-      select: { id: true, content: true, authorId: true },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+      },
     });
     if (posts.length < 2) {
       throw new Error('Not enough posts to generate AI post');
     }
 
-    const originalPosts = posts.map(
-      (post: { id: number; content: string; authorId: number }) => {
-        return { id: post.id, content: post.content, authorId: post.authorId };
-      },
-    );
+    const originalPosts = posts.map((post: Post) => {
+      return {
+        id: post.id,
+        content: post.content,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        authorId: post.authorId,
+      };
+    });
 
     // 投稿を英語に翻訳する
     const translatedFirstPost = await this.translateTextToEnglish(
@@ -58,6 +69,20 @@ export class AiPostService {
       const aiPost = await this.prisma.aipost.create({
         data: {
           content: dto.content,
+          post_to_aiposts: {
+            create: [
+              {
+                post: {
+                  connect: { id: dto.firstPostId },
+                },
+              },
+              {
+                post: {
+                  connect: { id: dto.secondPostId },
+                },
+              },
+            ],
+          },
         },
       });
       return aiPost;
@@ -68,8 +93,16 @@ export class AiPostService {
 
   async getManyAiPosts() {
     try {
-      const posts = await this.prisma.aipost.findMany();
-      return posts;
+      const aiPosts = await this.prisma.aipost.findMany({
+        include: {
+          post_to_aiposts: {
+            include: {
+              post: true,
+            },
+          },
+        },
+      });
+      return aiPosts;
     } catch (error) {
       throw new Error('Failed to get AI posts');
     }
