@@ -26,19 +26,10 @@ export class AiPostService {
         authorId: true,
       },
     });
+
     if (posts.length < 2) {
       throw new Error('Not enough posts to generate AI post');
     }
-
-    const originalPosts = posts.map((post: Post) => {
-      return {
-        id: post.id,
-        content: post.content,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-        authorId: post.authorId,
-      };
-    });
 
     // 投稿を英語に翻訳する
     const translatedFirstPost = await this.translateTextToEnglish(
@@ -53,6 +44,7 @@ export class AiPostService {
       translatedFirstPost,
       translatedSecondPost,
     );
+
     if (!chatGPTResponse) {
       throw new Error('ChatGPT response is empty');
     }
@@ -61,7 +53,7 @@ export class AiPostService {
     const translatedChatGPTResponse =
       await this.translateTextToJapanese(chatGPTResponse);
 
-    return { content: translatedChatGPTResponse, originalPosts };
+    return { content: translatedChatGPTResponse, posts };
   }
 
   async createAiPost(dto: CreateAiPostDto) {
