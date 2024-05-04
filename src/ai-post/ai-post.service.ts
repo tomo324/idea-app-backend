@@ -4,7 +4,6 @@ import { CreateAiPostDto } from './dto';
 import prismaRandom from 'prisma-extension-random';
 import OpenAI from 'openai';
 import * as deepl from 'deepl-node';
-import { Post } from 'src/post/interface';
 
 @Injectable()
 export class AiPostService {
