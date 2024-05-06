@@ -93,6 +93,7 @@ export class AiPostService {
           },
         },
       });
+      aiPosts.reverse();
       return aiPosts;
     } catch (error) {
       throw new Error('Failed to get AI posts');

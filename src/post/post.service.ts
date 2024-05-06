@@ -24,6 +24,7 @@ export class PostService {
   async getManyPosts() {
     try {
       const posts = await this.prisma.post.findMany();
+      posts.reverse();
       return posts;
     } catch (error) {
       throw error;
@@ -46,6 +47,7 @@ export class PostService {
       const posts = await this.prisma.post.findMany({
         where: { authorId: userId },
       });
+      posts.reverse();
       return posts;
     } catch (error) {
       throw error;
