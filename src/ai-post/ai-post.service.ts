@@ -84,7 +84,8 @@ export class AiPostService {
 
   async getManyAiPosts() {
     try {
-      const aiPosts = await this.prisma.aipost.findMany({
+      let aiPosts;
+      aiPosts = await this.prisma.aipost.findMany({
         include: {
           post_to_aiposts: {
             include: {
@@ -93,6 +94,16 @@ export class AiPostService {
           },
         },
       });
+      if (!aiPosts) {
+        throw new Error('AI posts not found');
+      }
+      // 必要な情報だけを取り出す
+      aiPosts = aiPosts.map((aiPost) => {
+        const { post_to_aiposts, ...rest } = aiPost;
+        const posts = post_to_aiposts.map(({ post }) => post);
+        return { ...rest, posts };
+      });
+      // 投稿を新しい順に並び替える
       aiPosts.reverse();
       return aiPosts;
     } catch (error) {
