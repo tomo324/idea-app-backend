@@ -24,6 +24,7 @@ export class PostService {
   async getManyPosts() {
     try {
       const posts = await this.prisma.post.findMany();
+      // 投稿を新しい順に並び替える
       posts.reverse();
       return posts;
     } catch (error) {
