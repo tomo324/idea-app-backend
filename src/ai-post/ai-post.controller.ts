@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { AiPostService } from './ai-post.service';
 import { CreateAiPostDto } from './dto';
@@ -21,5 +32,11 @@ export class AiPostController {
   @Post('create')
   createAiPost(@Body() dto: CreateAiPostDto) {
     return this.aiPostService.createAiPost(dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete(':id')
+  deleteAiPost(@Param('id', ParseIntPipe) aiPostId: number) {
+    return this.aiPostService.deleteAiPost(aiPostId);
   }
 }
