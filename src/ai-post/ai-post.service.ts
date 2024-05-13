@@ -111,6 +111,19 @@ export class AiPostService {
     }
   }
 
+  async deleteAiPost(aiPostId: number) {
+    try {
+      await this.prisma.postToAipost.deleteMany({
+        where: { aipostId: aiPostId },
+      });
+      await this.prisma.aipost.delete({
+        where: { id: aiPostId },
+      });
+    } catch (error) {
+      throw new Error('Failed to delete AI post');
+    }
+  }
+
   async translateTextToEnglish(text: string) {
     const deeplAuthKey = process.env.DEEPL_API_KEY;
     if (!deeplAuthKey) {
