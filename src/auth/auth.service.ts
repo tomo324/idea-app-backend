@@ -14,9 +14,9 @@ export class AuthService {
     private config: ConfigService,
   ) {}
   async signup(signupDto: SignupDto) {
-    // generate the hash of the password
+    // パスワードをハッシュ化する
     const hash = await argon.hash(signupDto.password);
-    // save the new user in the db
+    // ユーザーを作成する
     try {
       const user = await this.prisma.user.create({
         data: {
@@ -27,6 +27,7 @@ export class AuthService {
       });
       return this.signToken(user.id, user.email);
     } catch (error) {
+      console.error(error);
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException('Email already exists');
@@ -37,24 +38,29 @@ export class AuthService {
   }
 
   async signin(signinDto: SigninDto) {
-    // find the user by email
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: signinDto.email,
-      },
-    });
-    // if user does not exist throw exception
-    if (!user) {
-      throw new ForbiddenException('Credentials incorrect');
-    }
+    try {
+      // メールアドレスからユーザーを取得する
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email: signinDto.email,
+        },
+      });
+      // ユーザーが存在しない場合は例外をスローする
+      if (!user) {
+        throw new ForbiddenException('Credentials incorrect');
+      }
 
-    // compare the password
-    const pwMatches = await argon.verify(user.hash, signinDto.password);
-    // if password incorrect throw exception
-    if (!pwMatches) {
-      throw new ForbiddenException('Credentials incorrect');
+      // パスワードが一致するか確認する
+      const pwMatches = await argon.verify(user.hash, signinDto.password);
+      // パスワードが一致しない場合は例外をスローする
+      if (!pwMatches) {
+        throw new ForbiddenException('Credentials incorrect');
+      }
+      return this.signToken(user.id, user.email);
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    return this.signToken(user.id, user.email);
   }
 
   async signToken(userId: number, email: string) {
