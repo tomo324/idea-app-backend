@@ -6,8 +6,6 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { CorsMiddleware } from './middleware';
 import { PostModule } from './post/post.module';
-import { AiPostController } from './ai-post/ai-post.controller';
-import { AiPostService } from './ai-post/ai-post.service';
 import { AiPostModule } from './ai-post/ai-post.module';
 
 @Module({

@@ -1,6 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PostService {
@@ -16,7 +22,8 @@ export class PostService {
       });
       return post;
     } catch (error) {
-      throw error;
+      console.error(error);
+      throw new InternalServerErrorException('internal server error');
     }
   }
 
@@ -24,11 +31,19 @@ export class PostService {
   async getManyPosts() {
     try {
       const posts = await this.prisma.post.findMany();
+      if (!posts || posts.length === 0) {
+        throw new NotFoundException('posts not found');
+      }
       // 投稿を新しい順に並び替える
       posts.reverse();
       return posts;
     } catch (error) {
-      throw error;
+      console.error(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new InternalServerErrorException('database error');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -37,9 +52,17 @@ export class PostService {
       const post = await this.prisma.post.findUnique({
         where: { id: postId },
       });
+      if (!post) {
+        throw new NotFoundException('post not found');
+      }
       return post;
     } catch (error) {
-      throw error;
+      console.error(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new InternalServerErrorException('database error');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -48,10 +71,18 @@ export class PostService {
       const posts = await this.prisma.post.findMany({
         where: { authorId: userId },
       });
+      if (!posts || posts.length === 0) {
+        throw new NotFoundException('posts not found');
+      }
       posts.reverse();
       return posts;
     } catch (error) {
-      throw error;
+      console.error(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new InternalServerErrorException('database error');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -60,24 +91,34 @@ export class PostService {
       const post = await this.prisma.post.findUnique({
         where: { id: postId },
       });
+
       if (!post) {
-        throw new Error('cannot find post');
+        throw new NotFoundException('post not found');
       }
+
       if (post.authorId !== userId) {
-        throw new Error('you are not the author of the post');
+        throw new ForbiddenException('you are not the author of this post');
       }
+
       const aiPost = await this.prisma.postToAipost.findMany({
         where: { postId: postId },
       });
+
       if (aiPost.length) {
-        throw new Error('this post is used in AI post');
+        throw new ForbiddenException('this post is used in AI post');
       }
+
       await this.prisma.post.delete({
         where: { id: postId },
       });
       return post;
     } catch (error) {
-      throw error;
+      console.error(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new InternalServerErrorException('database error');
+      } else {
+        throw error;
+      }
     }
   }
 }
