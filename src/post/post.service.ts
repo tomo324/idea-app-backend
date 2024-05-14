@@ -61,10 +61,16 @@ export class PostService {
         where: { id: postId },
       });
       if (!post) {
-        throw new Error('投稿が見つかりません');
+        throw new Error('cannot find post');
       }
       if (post.authorId !== userId) {
-        throw new Error('投稿の削除権限がありません');
+        throw new Error('you are not the author of the post');
+      }
+      const aiPost = await this.prisma.postToAipost.findMany({
+        where: { postId: postId },
+      });
+      if (aiPost.length) {
+        throw new Error('this post is used in AI post');
       }
       await this.prisma.post.delete({
         where: { id: postId },
