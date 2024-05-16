@@ -23,6 +23,8 @@
 
 ORM: Prisma(ver 5.7.1)
 
+CSSフレームワーク: Tailwind CSS
+
 DB: PostgreSQL
 
 開発ツール: Docker / Storybook
@@ -37,6 +39,8 @@ E2Eテスト: Jest / pactumjs
 デプロイ: Vercel(フロント) / Heroku(バックエンド)
 
 外部サービス: DeepL API / ChatGPT API
+
+デザイン: Figma
 
 ## 工夫したポイント
 
