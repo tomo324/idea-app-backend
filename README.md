@@ -1,73 +1,54 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## フロントエンドのレポジトリはこちら
+<p>https://github.com/tomo324/idea-app-front</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## このサービスについて
+<p>アイデアを投稿して共有するサービスです。AI融合機能によって、投稿された複数のアイデアを融合して新しいアイデアを生み出すことができます。</p>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 作った理由
+<p>「多くの人に価値を届けるサービスを作りたい。しかし、どのようなサービスがより多くのニーズに答えられるのか分からない。」このような状況で試行錯誤した個人的な経験から、このサービスを開発しました。
+<br>
 
-## Description
+世の中に浸透し私たちの生活の一部になっているサービスも、最初は些細な気づきから生まれました。「ここが不便だ」「こんなサービスがあったらいいのに」という些細な気づきは、多くの可能性をはらんでいます。
+<br>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+アイデアは人間の経験から生まれます。生成AIを利用しても、画期的なアイデアをゼロから生み出すことは難しいです。このサービスは、人々が経験に基づいた「気づき」を投稿し、AIによる融合を組み合わせることで、ニーズに沿った画期的なアイデアを生み出すことを目的としています。
+<br>
 
-## Installation
+人々の気づきによる多様なアイデアと、AIによる融合の組み合わせによって、このサービスが生み出せる価値は無限大に広がっていくと考えています。</p>
 
-```bash
-$ yarn install
-```
+## 技術構成
+フロントエンド: TypeScript(ver 5.3.3) / React(ver 18.2.0) / Next.js(App router) (ver 14.1.0)
 
-## Running the app
+バックエンド: TypeScript(ver 5.3.3) / Nestjs(ver 10.2.1)
 
-```bash
-# development
-$ yarn run start
+ORM: Prisma(ver 5.7.1)
 
-# watch mode
-$ yarn run start:dev
+DB: PostgreSQL
 
-# production mode
-$ yarn run start:prod
-```
+開発ツール: Docker / Storybook
 
-## Test
+テスト:
+<br>
+E2Eテスト: Jest / pactumjs
+<br>
+ユニットテスト: Jest / React Testing Library
+<br>
 
-```bash
-# unit tests
-$ yarn run test
+デプロイ: Vercel(フロント) / Heroku(バックエンド)
 
-# e2e tests
-$ yarn run test:e2e
+外部サービス: DeepL API / ChatGPT API
 
-# test coverage
-$ yarn run test:cov
-```
+## 工夫したポイント
 
-## Support
+### サービスの機能がユーザー数に依存し過ぎないようにした
+SNSのようなサービスを個人開発する際、ネックとなるのがユーザー数の確保です。多くのユーザーがいないと機能を十分に利用できないサービスの場合、ユーザー数が少ないリリースの初期段階では使える機能が制限され、「つまらない」と感じてしまいます。
+<br>
+このサービスではAI融合機能にランダム性を持たせ、ユーザー数や投稿数が少なくても様々な融合パターンを楽しめるようにしました。もちろん、ユーザー数が多ければ多いほど多様なアイデアを扱うことができるようになり、サービスはより面白くなります！
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### UI, UXへのこだわり
+快適に操作できるかがユーザーの定着率を左右すると考え、UI, UXには特にこだわりました。一部、人気サービスのUIを参考にすることにより、より多くの人が直感的に操作できるようにしました。
+<br>
+Next.jsのIntercepting Routesを取り入れることにより高い操作感でモーダル等を扱えるようにしました。
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+### テストを開発に積極的に取り入れた
+機能の拡張やリファクタリングの際にコードの品質を維持しやすくするため、開発の中でE2Eテストやユニットテストを積極的に取り入れました。また、テスト駆動開発のサイクルを回しながら開発を行うことで、仕様を明確にした上で実装できるようになりました。
