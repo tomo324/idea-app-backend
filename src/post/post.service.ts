@@ -105,7 +105,7 @@ export class PostService {
       });
 
       if (aiPost.length) {
-        throw new ForbiddenException('this post is used in AI post');
+        throw new ForbiddenException('AI融合に使用された投稿は削除できません');
       }
 
       await this.prisma.post.delete({
