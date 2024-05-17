@@ -19,7 +19,7 @@
 ## 技術構成
 フロントエンド: TypeScript(ver 5.3.3) / React(ver 18.2.0) / Next.js(App router) (ver 14.1.0)
 
-バックエンド: TypeScript(ver 5.3.3) / Nestjs(ver 10.2.1)
+バックエンド: TypeScript(ver 5.3.3) / NestJS(ver 10.2.1)
 
 ORM: Prisma(ver 5.7.1)
 
@@ -29,12 +29,7 @@ DB: PostgreSQL
 
 開発ツール: Docker / Storybook
 
-テスト:
-<br>
-E2Eテスト: Jest / pactumjs
-<br>
-ユニットテスト: Jest / React Testing Library
-<br>
+テスト: Jest / PactumJS / React Testing Library
 
 デプロイ: Vercel(フロント) / Heroku(バックエンド)
 
