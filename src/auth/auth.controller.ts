@@ -7,8 +7,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
 import { SigninDto, SignupDto } from './dto';
+import { FastifyReply } from 'fastify';
 
 @Controller('auth')
 export class AuthController {
@@ -18,11 +18,12 @@ export class AuthController {
   @Post('signup')
   async signup(
     @Body() dto: SignupDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const accessToken = await this.authService.signup(dto);
     const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('accessToken', accessToken, {
+    res.setCookie('accessToken', accessToken, {
+      path: '/',
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
@@ -33,11 +34,12 @@ export class AuthController {
   @Post('signin')
   async signin(
     @Body() dto: SigninDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const accessToken = await this.authService.signin(dto);
     const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('accessToken', accessToken, {
+    res.setCookie('accessToken', accessToken, {
+      path: '/',
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
