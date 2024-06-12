@@ -20,6 +20,8 @@ async function bootstrap() {
     origin: origins,
     credentials: true,
   });
+  // TODO csrf対策
+  await app.register(fastifyCsrf);
   await app.listen(process.env.PORT || 3333);
 }
 bootstrap();
