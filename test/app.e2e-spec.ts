@@ -1,14 +1,20 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import * as pactum from 'pactum';
 import { SignupDto, SigninDto } from 'src/auth/dto';
 import { EditUserDto } from 'src/user/dto';
-import * as cookieParser from 'cookie-parser';
+import fastifyCookie from '@fastify/cookie';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import helmet from '@fastify/helmet';
+import fastifyCsrf from '@fastify/csrf-protection';
 
 describe('App e2e', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
   let prisma: PrismaService;
   let cookie: any;
 
@@ -16,10 +22,24 @@ describe('App e2e', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
+    app.register(fastifyCookie, {
+      secret: process.env.COOKIE_SECRET,
+    });
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-    app.use(cookieParser());
-
+    app.register(helmet);
+    app.enableCors({
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? 'https://aidea-park.vercel.app'
+          : 'http://localhost:3000',
+      methods: 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+      allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+      credentials: true,
+    });
+    await app.register(fastifyCsrf);
     await app.init();
     await app.listen(3333);
 
