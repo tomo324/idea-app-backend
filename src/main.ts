@@ -33,7 +33,6 @@ async function bootstrap() {
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
     credentials: true,
   });
-  // TODO csrf対策
   await app.register(fastifyCsrf);
   await app.listen(process.env.PORT || 3333);
 }
