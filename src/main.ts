@@ -34,6 +34,6 @@ async function bootstrap() {
     credentials: true,
   });
   await app.register(fastifyCsrf);
-  await app.listen(process.env.PORT || 3333);
+  await app.listen(process.env.PORT || 3333, '0.0.0.0');
 }
 bootstrap();
