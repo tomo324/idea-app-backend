@@ -93,8 +93,7 @@ export class AiPostService {
 
   async getManyAiPosts() {
     try {
-      let aiPosts;
-      aiPosts = await this.prisma.aipost.findMany({
+      const rawAiPosts = await this.prisma.aipost.findMany({
         include: {
           post_to_aiposts: {
             include: {
@@ -104,18 +103,58 @@ export class AiPostService {
         },
       });
 
-      if (!aiPosts || aiPosts.length === 0) {
+      if (!rawAiPosts || rawAiPosts.length === 0) {
         throw new NotFoundException('AI posts not found');
       }
 
       // 中間テーブルの情報を削除する
-      aiPosts = aiPosts.map((aiPost) => {
+      const aiPosts = rawAiPosts.map((aiPost) => {
         const { post_to_aiposts, ...rest } = aiPost;
         const posts = post_to_aiposts.map(({ post }) => post);
         return { ...rest, posts };
       });
 
       // 投稿を新しい順に並び替える
+      aiPosts.reverse();
+      return aiPosts;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new InternalServerErrorException('database error');
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  async getRelatedAiPosts(postId: number) {
+    try {
+      const rawAiPosts = await this.prisma.aipost.findMany({
+        where: {
+          post_to_aiposts: {
+            some: {
+              postId: postId,
+            },
+          },
+        },
+        include: {
+          post_to_aiposts: {
+            include: {
+              post: true,
+            },
+          },
+        },
+      });
+      if (!rawAiPosts || rawAiPosts.length === 0) {
+        throw new NotFoundException('AI posts not found');
+      }
+
+      const aiPosts = rawAiPosts.map((aiPost) => {
+        const { post_to_aiposts, ...rest } = aiPost;
+        const posts = post_to_aiposts.map(({ post }) => post);
+        return { ...rest, posts };
+      });
+
       aiPosts.reverse();
       return aiPosts;
     } catch (error) {

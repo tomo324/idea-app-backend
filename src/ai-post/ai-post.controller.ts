@@ -24,6 +24,11 @@ export class AiPostController {
     return this.aiPostService.getManyAiPosts();
   }
 
+  @Get('related/:id')
+  getRelatedAiPosts(@Param('id', ParseIntPipe) postId: number) {
+    return this.aiPostService.getRelatedAiPosts(postId);
+  }
+
   @Get('generate')
   generateRandomAiPost() {
     return this.aiPostService.generateAiPostRandom();
