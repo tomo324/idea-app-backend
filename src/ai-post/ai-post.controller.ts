@@ -25,8 +25,13 @@ export class AiPostController {
   }
 
   @Get('generate')
-  generateAiPost() {
-    return this.aiPostService.generateAiPost();
+  generateRandomAiPost() {
+    return this.aiPostService.generateAiPostRandom();
+  }
+
+  @Get('generate-with/:id')
+  generateAiPostWith(@Param('id', ParseIntPipe) postId: number) {
+    return this.aiPostService.generateAiPostWith(postId);
   }
 
   @Post('create')

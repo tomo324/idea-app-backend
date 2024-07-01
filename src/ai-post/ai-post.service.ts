@@ -11,6 +11,7 @@ import prismaRandom from 'prisma-extension-random';
 import OpenAI from 'openai';
 import * as deepl from 'deepl-node';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Post } from 'src/post/interface';
 
 @Injectable()
 export class AiPostService {
@@ -20,7 +21,7 @@ export class AiPostService {
     this.prisma = this.prismaService.$extends(prismaRandom());
   }
 
-  async generateAiPost() {
+  async generateAiPostRandom() {
     // 投稿をランダムに取得する
     // TODO 型エラーを直す
     const posts: any = await this.prisma.post.findManyRandom(2, {
@@ -32,34 +33,34 @@ export class AiPostService {
         authorId: true,
       },
     });
-
-    if (posts.length < 2) {
-      throw new BadRequestException('Not enough posts to generate AI post');
+    if (!posts || posts.length === 0) {
+      throw new NotFoundException('Posts not found');
     }
+    const aiPost = await this.generate(posts);
+    return aiPost;
+  }
 
-    // 投稿を英語に翻訳する
-    const translatedFirstPost = await this.translateTextToEnglish(
-      posts[0].content,
-    );
-    const translatedSecondPost = await this.translateTextToEnglish(
-      posts[1].content,
-    );
-
-    // ChatGPTを使って新しいアイデアを生成する
-    const chatGPTResponse = await this.useChatGPT(
-      translatedFirstPost,
-      translatedSecondPost,
-    );
-
-    if (!chatGPTResponse) {
-      throw new BadRequestException('Failed to generate AI post');
+  async generateAiPostWith(postId: number) {
+    const selectedPost = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+    if (!selectedPost) {
+      throw new NotFoundException('Post not found');
     }
-
-    // ChatGPTの結果を日本語に翻訳する
-    const translatedChatGPTResponse =
-      await this.translateTextToJapanese(chatGPTResponse);
-
-    return { content: translatedChatGPTResponse, posts };
+    const randomPost: any = await this.prisma.post.findManyRandom(1, {
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+      },
+    });
+    if (!randomPost || randomPost.length === 0) {
+      throw new NotFoundException('Random post not found');
+    }
+    const aiPost = await this.generate([selectedPost, randomPost[0]]);
+    return aiPost;
   }
 
   async createAiPost(dto: CreateAiPostDto) {
@@ -107,7 +108,7 @@ export class AiPostService {
         throw new NotFoundException('AI posts not found');
       }
 
-      // 必要な情報だけを取り出す
+      // 中間テーブルの情報を削除する
       aiPosts = aiPosts.map((aiPost) => {
         const { post_to_aiposts, ...rest } = aiPost;
         const posts = post_to_aiposts.map(({ post }) => post);
@@ -211,5 +212,35 @@ export class AiPostService {
         throw error;
       }
     }
+  }
+
+  async generate(posts: Post[]) {
+    if (posts.length < 2) {
+      throw new BadRequestException('Not enough posts to generate AI post');
+    }
+
+    // 投稿を英語に翻訳する
+    const englishFirstPost = await this.translateTextToEnglish(
+      posts[0].content,
+    );
+    const englishSecondPost = await this.translateTextToEnglish(
+      posts[1].content,
+    );
+
+    // ChatGPTを使って新しいアイデアを生成する
+    const chatGPTResponse = await this.useChatGPT(
+      englishFirstPost,
+      englishSecondPost,
+    );
+
+    if (!chatGPTResponse) {
+      throw new BadRequestException('Failed to generate AI post');
+    }
+
+    // ChatGPTの結果を日本語に翻訳する
+    const japaneseChatGPTResponse =
+      await this.translateTextToJapanese(chatGPTResponse);
+
+    return { content: japaneseChatGPTResponse, posts };
   }
 }
