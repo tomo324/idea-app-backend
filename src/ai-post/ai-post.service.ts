@@ -227,7 +227,7 @@ export class AiPostService {
       apiKey: process.env.CHATGPT_API_KEY,
     });
     const gpt_prompt =
-      'Combine the two ideas above to create a new idea. Answer in 230 characters or less.';
+      'Combine the two ideas above to create a new idea. Please give a specific answer. Answer in 300 characters or less.';
     try {
       const completion = await openai.chat.completions.create({
         messages: [
@@ -236,8 +236,8 @@ export class AiPostService {
             content: `1: ${firstPost}, 2: ${secondPost}, ${gpt_prompt}`,
           },
         ],
-        model: 'gpt-3.5-turbo',
-        max_tokens: 150,
+        model: 'gpt-4o-mini',
+        max_tokens: 350,
       });
       if (!completion.choices || completion.choices.length === 0) {
         throw new BadRequestException('Failed to generate AI post');
